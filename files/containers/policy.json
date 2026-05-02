@@ -1,0 +1,20 @@
+{
+	"default": [
+		{
+			"type": "reject"
+		}
+	],
+	"transports": {
+		"docker": {
+			"ghcr.io/tomfalk/ublue-niri": [
+				{
+					"type": "sigstoreSigned",
+					"keyPath": "/etc/pki/containers/cosign.pub",
+					"signedIdentity": {
+						"type": "matchRepository"
+					}
+				}
+			]
+		}
+	}
+}

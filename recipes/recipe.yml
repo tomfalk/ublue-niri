@@ -1,20 +1,309 @@
----
-# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-# image will be published to ghcr.io/<user>/<name>
-name: ublue-niri
-# description will be included in the image's metadata
-description: This is my personal OS image.
+name: fedora-laptop-niri
+description: Minimal Fedora Intel laptop with Niri + Noctalia
+base-image: quay.io/fedora/fedora-bootc
+image-version: 44
 
-# the base image to build on top of (FROM) and the version tag to use
-base-image: quay.io/fedora-ostree-desktops/base-atomic
-image-version: 44 # latest is also supported if you want new updates ASAP
-
-# module configuration, executed in order
-# you can include multiple instances of the same module
 modules:
-  - from-file: common/sddm-modules.yml
-  - from-file: common/common-modules.yml
-  - from-file: common/niri-modules.yml
-  - from-file: common/final-modules.yml
+  - type: copy
+    src:  files/certs/cosign.pub
+    dest: /etc/pki/containers/cosign.pub
 
-  - type: signing # this sets up the proper policy & signing files for signed images to work fully
+  - type: copy
+    src:  files/containers/registries.d/ghcr.yaml
+    dest: /etc/containers/registries.d/ghcr.yaml
+
+  - type: signing
+
+  - type: dnf
+    repos:
+      cleanup: true
+      copr:
+        - atim/starship
+        - yalter/niri-git
+        - zhangyi6324/noctalia-shell
+        - brycensranch/gpu-screen-recorder-git
+      files: 
+        - https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+        - https://repo.librewolf.net/librewolf.repo
+        - https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo
+        - https://repository.mullvad.net/rpm/stable/mullvad.repo
+    install:
+      skip-unavailable: true
+      packages:
+        - niri
+        - noctalia-shell
+        - xwayland-run
+        - alacritty
+        - nautilus
+        - flatpak
+        - neovim
+
+        - xdg-desktop-portal
+        - xdg-desktop-portal-gtk
+        - greetd
+        - cage
+        - gtkgreet
+        
+        - iwlwifi-mvm-firmware
+        - alsa-sof-firmware
+        - alsa-ucm
+        - tuned
+        - tuned-ppd
+
+        - gvfs-mtp
+
+        - wget
+        - git
+        - mtr
+        - rsync
+        - wpa_supplicant
+        - NetworkManager-wifi
+
+        - glibc-langpack-en
+        - glibc-langpack-ru
+        - google-noto-sans-vf-fonts
+        - google-noto-sans-mono-vf-fonts
+        - google-noto-serif-vf-fonts
+        - google-noto-color-emoji-fonts
+
+        - wl-clipboard
+        - distrobox
+        - alsa-firmware
+        - polkit
+        - dbus-tools
+        - dbus-daemon
+        - qt5-wayland
+        - qt6-wayland
+        - wireplumber
+        - pipewire
+        - pulseaudio-utils
+        - network-manager-applet
+        - NetworkManager-openvpn
+        - NetworkManager-openvpn-gnome
+        - NetworkManager-openconnect
+        - NetworkManager-openconnect-gnome
+        - bluez
+        - bluez-tools
+        - blueman
+        - gvfs-mtp
+        - gvfs-gphoto2
+        - gvfs-smb
+        - gvfs-nfs
+        - gvfs-fuse
+        - gvfs-archive
+        - heif-pixbuf-loader
+        - ffmpeg
+        - ffmpeg-libs
+        - ffmpegthumbnailer
+        - pipewire-libs-extra
+        - libfdk-aac
+        - gstreamer1-plugins-bad
+        - gstreamer1-plugins-ugly 
+        - gnome-keyring
+        - luajit
+        - luajit-devel
+        - dconf
+        - dconf-editor
+        - gsettings-desktop-schemas
+        - mullvad
+        - micro
+        - starship
+        - swww
+        - swaync
+        - greetd-selinux
+        - xwayland-satellite
+        - adw-gtk3-theme
+        - xdg-desktop-portal-gnome
+        - firacode-nerd-fonts
+        - fish
+        - gtklock
+        - wofi
+        - fuzzel
+        - eza
+        - bat
+        - doas
+        - tailscale
+        - alacritty
+        - librewolf
+        - hyfetch
+        - fastfetch
+        - nwg-look
+        # adb, fastboot, shit like that
+        - android-tools 
+        - steam
+    remove:
+      packages:
+        - waybar
+        - swaybg
+        - swayidle
+        - swaylock
+        - polkit-kde
+        - polkit-kde-agent-1
+        - polkit-qt6-1
+
+        - cups
+        - cups-browsed
+        - cups-client
+        - cups-filters
+        - cups-filters-driverless
+        - hplip
+        - sane-airscan
+        - sane-backends
+
+        - plymouth
+        - plymouth-system-theme
+
+        - hunspell
+        - hunspell-en
+        - hunspell-en-GB
+        - hunspell-en-US
+        - osinfo-db
+        - osinfo-db-tools
+        - tesseract-common
+        - tesseract-langpack-eng
+
+        - glibc-all-langpacks
+        - langpacks-core-en
+        - langpacks-en
+        - langpacks-fonts-en
+        - default-fonts-am
+        - default-fonts-ar
+        - default-fonts-as
+        - default-fonts-ast
+        - default-fonts-be
+        - default-fonts-bg
+        - default-fonts-bo
+        - default-fonts-bn
+        - default-fonts-br
+        - default-fonts-chr
+        - default-fonts-dv
+        - default-fonts-dz
+        - default-fonts-el
+        - default-fonts-eo
+        - default-fonts-eu
+        - default-fonts-fa
+        - default-fonts-got
+        - default-fonts-gu
+        - default-fonts-he
+        - default-fonts-hi
+        - default-fonts-hy
+        - default-fonts-ia
+        - default-fonts-iu
+        - default-fonts-ka
+        - default-fonts-kab
+        - default-fonts-km
+        - default-fonts-kn
+        - default-fonts-ku
+        - default-fonts-lo
+        - default-fonts-mai
+        - default-fonts-ml
+        - default-fonts-mni
+        - default-fonts-mr
+        - default-fonts-my
+        - default-fonts-nb
+        - default-fonts-ne
+        - default-fonts-nn
+        - default-fonts-nqo
+        - default-fonts-nr
+        - default-fonts-nso
+        - default-fonts-or
+        - default-fonts-pa
+        - default-fonts-sat
+        - default-fonts-si
+        - default-fonts-ss
+        - default-fonts-syr
+        - default-fonts-ta
+        - default-fonts-te
+        - default-fonts-th
+        - default-fonts-tn
+        - default-fonts-ts
+        - default-fonts-uk
+        - default-fonts-ur
+        - default-fonts-ve
+        - default-fonts-vi
+        - default-fonts-xh
+        - default-fonts-yi
+        - default-fonts-zu
+        - google-noto-emoji-fonts
+        - google-noto-naskh-arabic-vf-fonts
+        - google-noto-sans-arabic-vf-fonts
+        - google-noto-sans-armenian-vf-fonts
+        - google-noto-sans-balinese-fonts
+        - google-noto-sans-bengali-vf-fonts
+        - google-noto-sans-canadian-aboriginal-vf-fonts
+        - google-noto-sans-cherokee-vf-fonts
+        - google-noto-sans-cjk-fonts
+        - google-noto-sans-devanagari-vf-fonts
+        - google-noto-sans-ethiopic-vf-fonts
+        - google-noto-sans-georgian-vf-fonts
+        - google-noto-sans-gothic-fonts
+        - google-noto-sans-gujarati-vf-fonts
+        - google-noto-sans-gurmukhi-vf-fonts
+        - google-noto-sans-hebrew-vf-fonts
+        - google-noto-sans-javanese-fonts
+        - google-noto-sans-kannada-vf-fonts
+        - google-noto-sans-khmer-vf-fonts
+        - google-noto-sans-lao-vf-fonts
+        - google-noto-sans-math-fonts
+        - google-noto-sans-meetei-mayek-vf-fonts
+        - google-noto-sans-mono-cjk-vf-fonts
+        - google-noto-sans-nko-fonts
+        - google-noto-sans-ol-chiki-vf-fonts
+        - google-noto-sans-oriya-vf-fonts
+        - google-noto-sans-sinhala-vf-fonts
+        - google-noto-sans-sundanese-fonts
+        - google-noto-sans-symbols-2-fonts
+        - google-noto-sans-symbols-vf-fonts
+        - google-noto-sans-syriac-vf-fonts
+        - google-noto-sans-tamil-vf-fonts
+        - google-noto-sans-telugu-vf-fonts
+        - google-noto-sans-thaana-vf-fonts
+        - google-noto-sans-thai-vf-fonts
+        - google-noto-serif-armenian-vf-fonts
+        - google-noto-serif-bengali-vf-fonts
+        - google-noto-serif-cjk-vf-fonts
+        - google-noto-serif-devanagari-vf-fonts
+        - google-noto-serif-ethiopic-vf-fonts
+        - google-noto-serif-georgian-vf-fonts
+        - google-noto-serif-gujarati-vf-fonts
+        - google-noto-serif-gurmukhi-vf-fonts
+        - google-noto-serif-hebrew-vf-fonts
+        - google-noto-serif-kannada-vf-fonts
+        - google-noto-serif-khmer-vf-fonts
+        - google-noto-serif-lao-vf-fonts
+        - google-noto-serif-oriya-vf-fonts
+        - google-noto-serif-sinhala-vf-fonts
+        - google-noto-serif-tamil-vf-fonts
+        - google-noto-serif-telugu-vf-fonts
+        - google-noto-serif-thai-vf-fonts
+
+        - avahi
+        - bind-utils
+        - nfs-utils
+        - passim
+        - polkit-pkla-compat
+        - rpcbind
+        - sos
+
+        - usbmuxd
+        - wsdd
+        - unbound
+
+  - type: script
+    snippets:
+      - |
+        mkdir -p /etc/greetd
+        cat > /etc/greetd/config.toml <<'EOF'
+        [terminal]
+        vt = 1
+
+        [default_session]
+        command = "cage -ds -m last -- gtkgreet -c niri"
+        user = "_greetd"
+        EOF
+
+      - |
+        cat > /etc/locale.conf <<'EOF'
+        LANG=en_US.UTF-8
+        LC_CTYPE=en_US.UTF-8
+        EOF
