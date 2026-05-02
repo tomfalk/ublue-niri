@@ -1,4 +1,4 @@
-name: fedora-laptop-niri
+name: ublue-niri
 description: Minimal Fedora Intel laptop with Niri + Noctalia
 base-image: quay.io/fedora/fedora-bootc
 image-version: 44
@@ -123,7 +123,6 @@ modules:
         - bat
         - doas
         - tailscale
-        - alacritty
         - librewolf
         - hyfetch
         - fastfetch
